@@ -1,0 +1,46 @@
+## GIT IGNORED FILES
+
+# IDE settings
+idea
+awcache
+vscode
+
+# Ignore production settings
+settings/*.secret
+
+# Ignore IDE config files
+.idea/
+~*
+*.pyc
+.vscode/
+
+# Python virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Temp files
+.DS_Store
+npm-debug.log
+
+# Service files
+coverage
+coverage.xml
+
+# Uvicorn/FastAPI PID file
+uvicorn.pid
+tmp.sh
+
+/*.png
+/*.csv
+
+# Node
+node_modules
+yarn
+nyc_output
+
+# Gunicorn
+gunicorn.pid
+venv
+.venv

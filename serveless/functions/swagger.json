@@ -1,0 +1,310 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Survey API",
+    "version": "1.0.0",
+    "description": "API for managing surveys and user authentication"
+  },
+  "servers": [
+    {
+      "url": "https://us-central1-serveless-survey-api.cloudfunctions.net/api",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "Authenticate user and return token",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/survey": {
+      "get": {
+        "summary": "List all surveys",
+        "operationId": "listSurveys",
+        "responses": {
+          "200": {
+            "description": "A list of surveys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Survey"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new survey",
+        "operationId": "createSurvey",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Survey created successfully"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/survey/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "The ID of the survey to retrieve or modify."
+        }
+      ],
+      "get": {
+        "summary": "Get a single survey",
+        "operationId": "getSurvey",
+        "responses": {
+          "200": {
+            "description": "Detailed information about a survey",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Survey"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a survey",
+        "operationId": "updateSurvey",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Survey updated successfully"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete a survey",
+        "operationId": "deleteSurvey",
+        "responses": {
+          "200": {
+            "description": "Survey deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/survey/{id}/vote": {
+      "put": {
+        "tags": ["Survey"],
+        "summary": "Vote on a survey option",
+        "description": "Registers a vote for a specific option in a survey.",
+        "operationId": "voteSurveyOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the survey to vote on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Option ID to vote for",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "optionId": {
+                    "type": "string",
+                    "description": "The ID of the option to vote for"
+                  }
+                },
+                "required": ["optionId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vote registered successfully. Returns the updated survey.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Survey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid option - the option ID provided does not exist in the survey."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    }
+    
+  },
+  "components": {
+    "schemas": {
+      "Survey": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SurveyInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": ["title", "description", "expiresAt", "options"]
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": ["login", "password"]
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Insira o token diretamente. NÃO adicione 'Bearer ' antes do token."
+      }
+    }
+  }
+}
